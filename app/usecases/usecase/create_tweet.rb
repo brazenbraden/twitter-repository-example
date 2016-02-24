@@ -1,14 +1,15 @@
 module Usecase
   class CreateTweet
-    attr_accessor :policy, :repo
+    attr_reader :policy, :repo
 
     def initialize(policy, repo)
       @policy = policy
       @repo = repo
     end
 
-    def execute(attributes = {})
-      @repo.new({tweet: attributes[:tweet]})
+    def execute(params = {})
+      policy.check
+      repo.create(params)
     end
 
   end

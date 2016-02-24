@@ -8,7 +8,7 @@ module Policy
       end
 
       def check
-
+        true
       end
 
     end

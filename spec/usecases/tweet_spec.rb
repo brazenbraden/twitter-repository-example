@@ -1,8 +1,4 @@
 require_relative '../spec_helper'
-require_relative '../../app/usecases/usecase/create_tweet'
-require_relative '../../app/policies/policy/user/can_create_tweet'
-require_relative '../../app/repositories/memory_repository/tweet_repository'
-require_relative '../../app/repositories/memory_repository/tweet'
 
 describe Usecase::CreateTweet do
 
@@ -23,7 +19,7 @@ describe Usecase::CreateTweet do
       expect(tweet.repo).to eql(repo)
     end
 
-    it 'should expect the Tweet repo' do
+    it 'should expect the Tweet Memory repo' do
       tweet = Usecase::CreateTweet.new(nil, MemoryRepository::TweetRepository.new)
       expect(tweet.repo).to be_an_instance_of(MemoryRepository::TweetRepository)
     end
@@ -31,11 +27,14 @@ describe Usecase::CreateTweet do
 
   context 'Executing the usecase' do
     before :each do
-      @tweet = Usecase::CreateTweet.new(nil, MemoryRepository::TweetRepository.new)
+      user = instance_double('User', name: 'Braden')
+      policy = Policy::User::CanCreateTweet.new(user)
+      repo = MemoryRepository::TweetRepository.new
+      @usecase = Usecase::CreateTweet.new(policy, repo)
     end
 
     it 'should have a method execute which takes a hash of params' do
-      expect{@tweet.execute({tweet: 'a tweet'})}.not_to raise_error
+      expect{@usecase.execute({tweet: 'a tweet'})}.not_to raise_error
     end
   end
 
@@ -56,16 +55,33 @@ describe Usecase::CreateTweet do
   end
 
   context 'the Tweet Repository' do
-    it 'should have a new method which accepts an hash' do
-      repo = MemoryRepository::TweetRepository.new
-      expect{repo.new}.not_to raise_error
+    before :each do
+      user = instance_double('User', name: 'Braden')
+      policy = Policy::User::CanCreateTweet.new(user)
+      @repo = MemoryRepository::TweetRepository.new
+      @usecase = Usecase::CreateTweet.new(policy, @repo)
     end
 
     it 'should return a tweet id' do
-      tweet = Usecase::CreateTweet.new(nil, MemoryRepository::TweetRepository.new)
-      result = tweet.execute('First Tweet')
-      expect(result.id).to eql(1)
+      tweet = @usecase.execute(tweet: 'First Tweet')
+      expect(tweet.id).to eql(1)
     end
+
+    it 'should store 2 tweets and return them' do
+      @usecase.execute(tweet: 'This is my first tweet!')
+      @usecase.execute(tweet: 'This is my second tweet!')
+      tweet1 = @repo.find(1)
+      tweet2 = @repo.find(2)
+      expect(tweet1.tweet).to eql('This is my first tweet!')
+      expect(tweet2.tweet).to eql('This is my second tweet!')
+    end
+
+    it 'should return all tweets when calling all' do
+      @usecase.execute(tweet: 'This is my first tweet!')
+      @usecase.execute(tweet: 'This is my second tweet!')
+      expect(@repo.all.count).to eql(2)
+    end
+
   end
 
 
