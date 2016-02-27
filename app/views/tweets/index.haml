@@ -1,1 +1,6 @@
-tweets index page
+= render 'form'
+
+%h2 All Tweets
+- @tweets.each do |tweet|
+  .tweet-container
+    %p.tweet= tweet.tweet
