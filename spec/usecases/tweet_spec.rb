@@ -2,43 +2,7 @@ require_relative '../spec_helper'
 
 describe Usecase::CreateTweet do
 
-  context 'Initializing an instance' do
-    it 'should return an instance of CreateTweet' do
-      expect(Usecase::CreateTweet.new(nil, nil)).to be_an_instance_of(Usecase::CreateTweet)
-    end
-
-    it 'should expect a policy' do
-      policy = {}
-      tweet = Usecase::CreateTweet.new(policy, nil)
-      expect(tweet.policy).to eql(policy)
-    end
-
-    it 'should expect a repo' do
-      repo = ''
-      tweet = Usecase::CreateTweet.new(nil, repo)
-      expect(tweet.repo).to eql(repo)
-    end
-
-    it 'should expect the Tweet Memory repo' do
-      tweet = Usecase::CreateTweet.new(nil, MemoryRepository::TweetRepository.new)
-      expect(tweet.repo).to be_an_instance_of(MemoryRepository::TweetRepository)
-    end
-  end
-
-  context 'Executing the usecase' do
-    before :each do
-      user = instance_double('User', name: 'Braden')
-      policy = Policy::User::CanCreateTweet.new(user)
-      repo = MemoryRepository::TweetRepository.new
-      @usecase = Usecase::CreateTweet.new(policy, repo)
-    end
-
-    it 'should have a method execute which takes a hash of params' do
-      expect{@usecase.execute({tweet: 'a tweet'})}.not_to raise_error
-    end
-  end
-
-  context 'the User::CanCreateTweet policy' do
+  context 'Policy::User::CanCreateTweet' do
     it 'is an instance of Policy::User::CanCreateTweet' do
       expect(Policy::User::CanCreateTweet.new({})).to be_an_instance_of(Policy::User::CanCreateTweet)
     end
@@ -54,12 +18,13 @@ describe Usecase::CreateTweet do
     end
   end
 
-  context 'the Tweet Repository' do
+  context 'Repository::Memory::Tweet' do
     before :each do
       user = instance_double('User', name: 'Braden')
       policy = Policy::User::CanCreateTweet.new(user)
       @repo = MemoryRepository::TweetRepository.new
-      @usecase = Usecase::CreateTweet.new(policy, @repo)
+      validator = Validator::TweetValidator.new
+      @usecase = Usecase::CreateTweet.new(policy, @repo, validator)
     end
 
     it 'should return a tweet id' do
@@ -82,6 +47,45 @@ describe Usecase::CreateTweet do
       expect(@repo.all.count).to eql(2)
     end
 
+  end
+
+  context 'Validator::TweetValidator' do
+    before :each do
+      @validator = Validator::TweetValidator.new
+    end
+
+    it 'should throw a Validation Exception if tweet is blank' do
+      expect{@validator.valid?({tweet: ''})}.to raise_error(ValidationException)
+    end
+
+    it 'shhould throw a Validation Exception is tweet is over 180 characters long' do
+      tweet = 'Bacon ipsum dolor amet frankfurter shankle tongue venison meatball, pork tail prosciutto pig beef ribs pancetta sirloin. Ball tip hamburger biltong, bacon alcatra capicola t-bone andouille fatback turkey. Meatloaf frankfurter turkey alcatra pig, cupim salami sausage pork flank turducken jerky boudin.'
+      expect{@validator.valid?({tweet: tweet})}.to raise_error(ValidationException)
+    end
+
+    it 'should allow a normal tweet' do
+      expect{@validator.valid?({tweet: 'This is a normal tweet'})}.not_to raise_error
+    end
+  end
+
+  context 'Usecase::Tweet' do
+    before :each do
+      user = instance_double('User', name: 'Braden')
+      policy = Policy::User::CanCreateTweet.new(user)
+      repo = MemoryRepository::TweetRepository.new
+      validator = Validator::TweetValidator.new
+      @usecase = Usecase::CreateTweet.new(policy, repo, validator)
+    end
+
+    it 'should have a method execute which takes a hash of params' do
+      expect{@usecase.execute({tweet: 'a tweet'})}.not_to raise_error
+    end
+
+    it 'should save the tweet' do
+      tweet = @usecase.execute(tweet: 'Hello World!')
+      expect(tweet.id).to eql(1)
+      expect(tweet.tweet).to eql('Hello World!')
+    end
   end
 
 
