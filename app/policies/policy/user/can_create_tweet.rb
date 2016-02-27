@@ -1,6 +1,6 @@
 module Policy
   module User
-    class CanCreateTweet
+    class CanCreateTweet < BasePolicy
       attr_accessor :user
 
       def initialize(user)
@@ -8,9 +8,15 @@ module Policy
       end
 
       def check
-        true
+        unless user.permissions.blank? || user.permissions[:tweet].blank?
+          fail unless user.permissions[:tweet].include?(:can_create_tweet)
+        else
+          fail 'Invalid permissions'
+        end
       end
 
+      private
+      attr_reader :user
     end
   end
 end
