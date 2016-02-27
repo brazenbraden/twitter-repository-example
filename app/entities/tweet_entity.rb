@@ -1,10 +1,4 @@
-class TweetEntity
-  include ActiveModel::Model
-  include Virtus.model
-
+class TweetEntity < BaseEntity
   attribute :id, Integer
   attribute :tweet, String
-
-  validates :tweet, null: false #max length = 180
-
 end
