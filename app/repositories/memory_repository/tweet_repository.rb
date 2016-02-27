@@ -1,37 +1,28 @@
 module MemoryRepository
   class TweetRepository
 
-    def initialize(params = {})
+    def initialize
       @records = {}
-      @id = 0
-      @temp_tweet_params = params
+      @id = 1
     end
 
     def all
-      @records
+      records
     end
 
     def create(params = {})
-      tweet = build_entity(params.merge(id: @id + 1))
-      @records[@id] = tweet
+      tweet = build_entity(params.merge(id: @id))
+      records[@id.to_i] = tweet
       @id += 1
       tweet
     end
 
-    def save
-      if @temp_tweet_params.present?
-        tweet = build_entity(@temp_tweet_params.merge!(id: @id + 1))
-        @records[@id] = tweet
-        @id += 1
-        tweet
-      end
-    end
-
     def find(id)
-      @records[id.to_i - 1]
+      records[id.to_i]
     end
 
     private
+    attr_accessor :records
 
     def build_entity(params = {})
       tweet = TweetEntity.new
