@@ -18,6 +18,8 @@ end
 
 group :development do
   gem 'web-console', '~> 2.0'
+  gem 'better_errors'
+  gem 'binding_of_caller'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
