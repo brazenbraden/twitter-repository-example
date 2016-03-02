@@ -31,5 +31,12 @@ module Twitter
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    require_relative '../app/repositories/repository'
+    require_relative '../app/repositories/memory_repository/tweet_repository'
+    require_relative '../app/repositories/sqlite_repository/tweet_repository'
+    configure do
+      Repository.register(:tweet, MemoryRepository::TweetRepository.new)
+    end
   end
 end
