@@ -7,12 +7,12 @@ module MemoryRepository
     end
 
     def all
-      records
+      records.values
     end
 
     def create(params = {})
       tweet = build_entity(params.merge(id: @id))
-      records[@id.to_i] = tweet
+      records[@id] = tweet
       @id += 1
       tweet
     end
@@ -27,6 +27,7 @@ module MemoryRepository
     def build_entity(params = {})
       tweet = TweetEntity.new
       tweet.attributes = params
+      tweet.timestamp = Time.now
       tweet
     end
 
