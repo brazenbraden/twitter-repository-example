@@ -6,7 +6,7 @@ class TweetsController < ApplicationController
   end
 
   def show
-
+    @tweet = repo.find(params[:id])
   end
 
   def create
@@ -25,7 +25,7 @@ class TweetsController < ApplicationController
   end
 
   def repo
-    SqliteRepository::TweetRepository.new
+    Repository.for(:tweet)
   end
 
   def policy(key)
