@@ -1,4 +1,5 @@
 require_relative '../spec_helper'
+require_relative '../tweet_helper'
 
 describe Usecase::CreateTweet do
 
@@ -37,6 +38,7 @@ describe Usecase::CreateTweet do
       @repo.create(tweet: 'This is my first tweet!')
       @repo.create(tweet: 'This is my second tweet!')
       expect(@repo.all.count).to eql(2)
+      expect(@repo.all.first.tweet).to eql('This is my first tweet!')
     end
 
   end
