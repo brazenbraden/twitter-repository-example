@@ -1,11 +1,11 @@
 module Usecase
-  class CreateTweet
+  class CreateTweet < BaseUsecase
 
-    def initialize(policy, repo, validator)
-      @policy = policy
-      @repo = repo
-      @validator = validator
-    end
+    # def initialize(policy, repo, validator)
+    #   @policy = policy
+    #   @repo = repo
+    #   @validator = validator
+    # end
 
     def execute(params = {})
       policy.check
@@ -13,7 +13,7 @@ module Usecase
       repo.create(params)
     end
 
-    private
-    attr_reader :policy, :repo, :validator
+    # private
+    # attr_reader :policy, :repo, :validator
   end
 end
