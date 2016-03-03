@@ -27,8 +27,23 @@ describe Usecase::CreateComment do
     end
   end
 
+  context 'Policy::User::CanCreateComment' do
+    it 'should fail if user does not have permission to create a comment' do
+      user = instance_double('User', permissions: { comment: []})
+      policy = Policy::User::CanCreateComment.new(user)
+      expect{policy.check}.to raise_error(PolicyException)
+    end
+
+    it 'should pass with valid user permissions' do
+      user = instance_double('User', permissions: { comment: [:can_create_comment]})
+      policy = Policy::User::CanCreateComment.new(user)
+      expect{policy.check}.not_to raise_error
+    end
+  end
+
   it 'should save a comment to a tweet' do
     tweet = instance_double('Tweet', id: 1, tweet: 'Hello world!')
+    comment = 'Welcome!'
 
   end
 end
