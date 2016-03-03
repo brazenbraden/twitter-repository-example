@@ -11,10 +11,16 @@ module MemoryRepository
     end
 
     def create(params = {})
-      tweet = build_entity(params.merge(id: @id))
+      tweet = build_tweet_entity(params.merge(id: @id))
       records[@id] = tweet
       @id += 1
       tweet
+    end
+
+    def update(tweet_id, params = {})
+      tweet = find(tweet_id)
+      comment = build_comment_entity(params)
+      p comment
     end
 
     def find(id)
@@ -24,11 +30,16 @@ module MemoryRepository
     private
     attr_accessor :records
 
-    def build_entity(params = {})
-      tweet = TweetEntity.new
-      tweet.attributes = params
+    def build_tweet_entity(params = {})
+      tweet = TweetEntity.new(params)
       tweet.timestamp = Time.now
       tweet
+    end
+
+    def build_comment_entity(params = {})
+      comment = CommentEntity.new(params)
+      comment.timestamp = Time.now
+      comment
     end
 
   end

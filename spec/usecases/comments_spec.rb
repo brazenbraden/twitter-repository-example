@@ -1,10 +1,19 @@
 require_relative '../spec_helper'
 require_relative '../comments_helper'
+require_relative '../tweet_helper'
 
 describe Usecase::CreateComment do
   it 'should create a comment entity' do
     entity = CommentEntity.new
     expect(entity).to be_an_instance_of(CommentEntity)
+  end
+
+  it 'should have an id and comment' do
+    entity = CommentEntity.new
+    entity.id = 1
+    entity.comment = 'A comment'
+    expect(entity.id).to eql(1)
+    expect(entity.comment).to eql('A comment')
   end
 
   context 'Validator::CommentValidator' do
@@ -41,9 +50,25 @@ describe Usecase::CreateComment do
     end
   end
 
-  it 'should save a comment to a tweet' do
-    tweet = instance_double('Tweet', id: 1, tweet: 'Hello world!')
-    comment = 'Welcome!'
+  context 'Usecase::CreateComment' do
+    before :each do
+      repo = MemoryRepository::TweetRepository.new
 
+      user = instance_double('User', permissions: { comment: [:can_create_comment], tweet: [:can_create_tweet] })
+      @tweet = Usecase::CreateTweet.new(
+        Policy::User::CanCreateTweet.new(user),
+        repo,
+        Validator::TweetValidator.new
+      ).execute(tweet: 'Some tweet')
+
+      policy = Policy::User::CanCreateComment.new(user)
+      validator = Validator::CommentValidator.new
+      @usecase = Usecase::CreateComment.new(policy, repo, validator)
+    end
+
+    it 'should save a comment to a tweet' do
+      comment = CommentEntity.new(comment: 'Welcome')
+      result = @usecase.execute(@tweet.id, comment)
+    end
   end
 end
