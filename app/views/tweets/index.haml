@@ -2,5 +2,8 @@
 
 %h2 All Tweets
 - @tweets.each do |tweet|
-  .tweet-container
-    %p.tweet= tweet.tweet
+  = link_to tweet_path(id: tweet.id) do
+    .tweet-container
+      %p.tweet
+        = tweet.tweet
+        = tweet.timestamp
