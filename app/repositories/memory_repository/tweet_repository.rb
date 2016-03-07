@@ -19,8 +19,10 @@ module MemoryRepository
 
     def update(tweet_id, params = {})
       tweet = find(tweet_id)
-      comment = build_comment_entity(params)
-      p comment
+      comment = build_comment_entity(params.merge(id: tweet.comments.count + 1))
+      tweet.comments << comment
+      records[tweet.id] = tweet
+      tweet
     end
 
     def find(id)

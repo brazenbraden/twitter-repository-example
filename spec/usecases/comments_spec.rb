@@ -69,6 +69,9 @@ describe Usecase::CreateComment do
     it 'should save a comment to a tweet' do
       comment = CommentEntity.new(comment: 'Welcome')
       result = @usecase.execute(@tweet.id, comment)
+      expect(result.id).to eql(1)
+      expect(result.comments.first.id).to eql(1)
+      expect(result.comments.first.comment).to eql('Welcome')
     end
   end
 end
