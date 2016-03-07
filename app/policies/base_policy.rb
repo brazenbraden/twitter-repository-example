@@ -5,7 +5,7 @@ class BasePolicy
     @user = user
   end
 
-  def fail(msg = 'Validation Exception thrown')
+  def fail(msg = 'Policy Exception thrown')
     raise PolicyException.new(msg)
   end
 
