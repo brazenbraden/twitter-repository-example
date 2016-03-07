@@ -54,9 +54,12 @@ describe Usecase::CreateReply do
 
   context 'Usecase::CreateReply' do
     it 'should be an instance of Usecase::CreateReply' do
-      expect(Usecase::CreateReply.new()).to be_an_instance_of(Usecase::CreateReply)
+      expect(Usecase::CreateReply.new(nil, nil, nil)).to be_an_instance_of(Usecase::CreateReply)
     end
 
+    it 'should create a reply to a comment' do
+
+    end
 
   end
 

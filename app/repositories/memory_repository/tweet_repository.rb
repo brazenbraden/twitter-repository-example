@@ -44,5 +44,11 @@ module MemoryRepository
       comment
     end
 
+    def build_reply_entity(params = {})
+      reply = ReplyEntity.new(params)
+      reply.timestamp = Time.now
+      reply
+    end
+
   end
 end
