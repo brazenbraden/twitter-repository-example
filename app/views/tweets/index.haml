@@ -1,4 +1,4 @@
-= render 'form'
+= render 'tweet_form'
 
 %h2 All Tweets
 - @tweets.each do |tweet|
@@ -6,4 +6,5 @@
     .tweet-container
       %p.tweet
         = tweet.tweet
+        %br
         = tweet.timestamp

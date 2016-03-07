@@ -1,2 +1,15 @@
-= @tweet.tweet
-= @tweet.timestamp
+.well
+  = @view.tweet_content
+  %br
+  = @view.tweet_timestamp
+
+= render 'comment_form'
+
+%br
+.panel.panel-default
+  .panel-heading
+    %h4 Comments
+  .panel-body
+    - @view.tweet.comments.each do |comment|
+      .well
+        = "#{comment.comment} (#{comment.timestamp.to_formatted_s(:short)})"
