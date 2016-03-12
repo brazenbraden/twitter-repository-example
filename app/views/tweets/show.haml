@@ -12,4 +12,5 @@
   .panel-body
     - @view.tweet.comments.each do |comment|
       .well
-        = "#{comment.comment} (#{comment.timestamp.to_formatted_s(:short)})"
+        = "#{comment.comment}" #(#{comment.created_at.to_formatted_s(:short)})
+        = render 'reply_form'

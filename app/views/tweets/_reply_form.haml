@@ -1,0 +1,3 @@
+= simple_form_for [@view.tweet.comments, ReplyEntity.new], url: tweet_path(id: @view.tweet.id), method: :patch do |f|
+  = f.input :content, placeholder: 'Reply here'
+  = f.button :submit
