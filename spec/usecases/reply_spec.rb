@@ -8,12 +8,10 @@ describe Usecase::CreateReply do
       expect(ReplyEntity.new).to be_an_instance_of(ReplyEntity)
     end
 
-    it 'should have an id, content and timestamp' do
-      time = Time.now
-      entity = ReplyEntity.new(id: 1, content: 'a reply', timestamp: time)
+    it 'should have an id, content' do
+      entity = ReplyEntity.new(id: 1, content: 'a reply')
       expect(entity.id).to eql(1)
       expect(entity.content).to eql('a reply')
-      expect(entity.timestamp).to eql(time)
     end
   end
 
@@ -59,6 +57,20 @@ describe Usecase::CreateReply do
 
     it 'should create a reply to a comment' do
 
+    end
+
+  end
+
+  context 'Mapper' do
+    before :each do
+      @repo = MemoryRepository::TweetRepository.new
+    end
+
+    it 'should return a ReplyEntity from the repo mapper when passed the correct params' do
+      params = {id: 1, reply_entity: {content: 'a reply'}} # assuming comment id of 1
+      result = @repo.mapper(params)
+      expect(result.first).to be_an_instance_of(ReplyEntity)
+      expect(result.first.content).to eql('a reply')
     end
 
   end

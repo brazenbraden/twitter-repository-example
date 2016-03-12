@@ -1,9 +1,9 @@
 module Validator
   class CommentValidator < BaseValidator
 
-    def valid?(comment)
-      fail if comment.blank?
-      fail if comment.length > 180
+    def valid?(params = {})
+      fail if params[:comment].blank?
+      fail if params[:comment].length > 180
     end
 
   end

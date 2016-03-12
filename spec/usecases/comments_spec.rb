@@ -74,4 +74,18 @@ describe Usecase::CreateComment do
       expect(result.comments.first.comment).to eql('Welcome')
     end
   end
+
+  context 'Mapper' do
+    before :each do
+      @repo = MemoryRepository::TweetRepository.new
+    end
+
+    it 'should return a CommentEntity from the repo mapper when passed the correct params' do
+      params = {id: 1, comment_entity: {comment: 'a comment'}} # assuming tweet id of 1
+      result = @repo.mapper(params)
+      expect(result.first).to be_an_instance_of(CommentEntity)
+      expect(result.first.comment).to eql('a comment')
+    end
+
+  end
 end
