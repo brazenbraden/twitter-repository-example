@@ -11,7 +11,7 @@ module Decorator
     end
 
     def tweet_timestamp
-      tweet.timestamp.to_formatted_s(:short)
+      tweet.created_at.to_formatted_s(:short) if tweet.created_at.present?
     end
 
   end
