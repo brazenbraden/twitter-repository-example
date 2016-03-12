@@ -2,6 +2,6 @@ class TweetEntity < BaseEntity
   attribute :id, Integer
   attribute :user_id, Integer
   attribute :tweet, String
-  attribute :timestamp, Time
+  attribute :created_at, Time
   attribute :comments, Array
 end
