@@ -1,10 +1,10 @@
 module Usecase
   class CreateReply < BaseUsecase
 
-    def execute(tweet_id, reply_entity)
-      validator.valid?(reply_entity.context)
+    def execute(params = {})
+      validator.valid?(params[:comment_entity][:reply_entity])
       policy.check
-      repo.update(tweet_id, reply_entity.attributes)
+      repo.update(params)
     end
 
   end

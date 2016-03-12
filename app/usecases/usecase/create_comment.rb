@@ -1,9 +1,9 @@
 module Usecase
   class CreateComment < BaseUsecase
-    def execute(tweet_id, comment_entity)
-      validator.valid? comment_entity.comment
+    def execute(params)
+      validator.valid? params[:comment_entity]
       policy.check
-      repo.update(tweet_id, comment_entity.attributes)
+      repo.update(params)
     end
 
   end
