@@ -2,9 +2,9 @@ module Usecase
   class CreateReply < BaseUsecase
 
     def execute(params = {})
-      validator.valid?(params[:comment_entity][:reply_entity])
+      validator.valid?(params[:reply_entity])
       policy.check
-      repo.update(params)
+      repo.create(params)
     end
 
   end

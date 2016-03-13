@@ -3,7 +3,7 @@ module Usecase
     def execute(params)
       validator.valid? params[:comment_entity]
       policy.check
-      repo.update(params)
+      repo.create(params)
     end
 
   end
