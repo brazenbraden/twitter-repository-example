@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20160307140925) do
   end
 
   create_table "tweets", force: :cascade do |t|
-    t.string   "tweet"
+    t.string   "tweet",      null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

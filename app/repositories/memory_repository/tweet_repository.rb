@@ -11,31 +11,15 @@ module MemoryRepository
     end
 
     def create(params = {})
-      tweet = mapper(params).first
-      tweet.id = @id
-      records[@id] = tweet
-      @id += 1
-      tweet
-    end
-
-    def update(params = {})
-      tweet = find(params[:id].to_i)
-      entities = mapper(params)
-      p entities
-      entities.each do |entity|
-        if entity.is_a?(CommentEntity)
-          comment = entity
-          comment.id = tweet.comments.count + 1
-          tweet.comments << comment
-        elsif entity.is_a?(ReplyEntity)
-          comment_id = params[:comment_entity][:id]
-          comment = tweet.comments[comment_id]
-          reply.id = tweet.comments.replies.count + 1
-          comment.replies << reply
-          tweet.comments[comment_id] = comment
-        end
+      tweet = mapper(params)
+      # Assumes we saving a new tweet.
+      if tweet.id.blank?
+        tweet.id = @id
+        update_record(@id, tweet)
+        @id += 1
+        return tweet
       end
-      records[tweet.id] = tweet
+      update_record(tweet.id, tweet)
       tweet
     end
 
@@ -43,85 +27,74 @@ module MemoryRepository
       records[id.to_i]
     end
 
-    # def mapper(params)
-    #   p "params: #{params}"
-    #   embedded = params.select {|k,v| k.to_s.include?('_entity')}
-    #   p "embedded: #{embedded}"
-    # end
+    # e.g.  repo.where(comment_id: 1)
+    # return tweet
+    def where(params)
+      if params.has_key?(:comment_id)
+        records.each do |key, tweet|
+          tweet.comments.each do |comment|
+            if comment.id == params[:comment_id].to_i
+              return tweet
+            end
+          end
+        end
+      end
+      # TODO: Raise a repository_exception as record wasnt found
+      nil
+    end
+
+    private
+
+    def update_record(id, tweet)
+      records[id] = tweet
+    end
 
     def mapper(params)
-      p "params: #{params}"
-      entities = []
-      entities << params.select do |k, v|
-        # p "key: #{k}"
-        # p "value: #{v}"
+      if params.has_key?(:tweet_entity)
+        return TweetEntity.new(params[:tweet_entity])
+      end
 
-        # if k.has_key?(:id)
-        #   return
-        # end
+      if params.has_key?(:comment_entity)
+        tweet = find(params[:id])
+        comment = CommentEntity.new(params[:comment_entity])
+        comment.id = tweet.comments.count + 1
+        comment.tweet_id = params[:id]
+        tweet.comments << comment
+        return tweet
+      end
 
-        if k.to_s.include?('_entity')
-          mapper(v)
+      if params.has_key?(:reply_entity)
+        tweet = where(comment_id: params[:id])
+        if tweet.blank?
+          # TODO: throw repo exception
+          return nil;
+        end
+        comment_index = nil
+        comment = tweet.comments.each_with_index do |comment, i|
+          if comment.id == params[:id].to_i
+            comment_index = i
+            comment
+          end
+        end.first
+
+        if comment_index.blank?
+          p "NO COMMENT FOUND"
+          # TODO: raise repo validation
+          return nil
         else
-          p "time to split the entity param"
-
-          xxx
-          # entity = k.split('_').collect { |str| str.capitalize }.join('')
-          # entity.constantize.new(v)
-          # entity
+          reply = ReplyEntity.new(params[:reply_entity])
+          reply.id = comment.replies.count + 1
+          reply.comment_id = comment.id
+          comment.replies << reply
+          tweet.comments[comment_index] = comment
+          return tweet
         end
 
       end
     end
-      # entities = build_entities([], params)
-
-      # p "Final Entities: #{entities}"
-      # entities
-
-      # params.each do |param|
-      #   key = param[0].to_s
-      #   values = param[1]
-      #   p values
-      #   if key.include?('_entity') && !values.include?('id')
-      #     entity = key.split('_').collect { |str| str.capitalize }.join('')
-      #     entities << entity.constantize.new(values)
-      #   end
-      # end
-      # entities
-    # end
-
-    # def build_entities(entities, params)
-    #     p "values: #{params}"
-    #     params.select do |key, value|
-    #       entities << build_entities(entities, value) if key.include?('_entity')
-    #     end
-    #     # if !params.include?('id')
-    #     #   if params.include?('_entity')
-    #     #     entity = key.split('_').collect { |str| str.capitalize }.join('')
-    #     #     entities << entity.constantize.new(values)
-    #     #     build_entities(entities, values)
-    #     #   end
-    #     # end
-    #     entities
-    # end
 
     private
     attr_accessor :records
-
-    # def build_tweet_entity(params = {})
-    #   tweet = TweetEntity.new(params)
-    #   tweet
-    # end
-
-    # def build_comment_entity(params = {})
-    #   comment = CommentEntity.new(params)
-    #   comment
-    # end
-    #
-    # def build_reply_entity(params = {})
-    #   reply = ReplyEntity.new(params)
-    #   reply
-    # end
 
   end
 end
