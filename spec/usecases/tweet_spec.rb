@@ -17,26 +17,26 @@ describe Usecase::CreateTweet do
     end
   end
 
-  context 'Repository::Memory::Tweet' do
+  context 'MemoryRepository::TweetRepository' do
     before :each do
       @repo = MemoryRepository::TweetRepository.new
     end
 
     it 'should return a tweet id' do
-      tweet = @repo.create(tweet: 'First Tweet')
+      tweet = @repo.create(tweet_entity: {tweet: 'First Tweet'})
       expect(tweet.id).to eql(1)
     end
 
     it 'should store 2 tweets and return them' do
-      tweet1 = @repo.create(tweet: 'This is my first tweet!')
-      tweet2 = @repo.create(tweet: 'This is my second tweet!')
+      tweet1 = @repo.create(tweet_entity: {tweet: 'This is my first tweet!'})
+      tweet2 = @repo.create(tweet_entity: {tweet: 'This is my second tweet!'})
       expect(tweet1.tweet).to eql('This is my first tweet!')
       expect(tweet2.tweet).to eql('This is my second tweet!')
     end
 
     it 'should return all tweets when calling all' do
-      @repo.create(tweet: 'This is my first tweet!')
-      @repo.create(tweet: 'This is my second tweet!')
+      @repo.create(tweet_entity: {tweet: 'This is my first tweet!'})
+      @repo.create(tweet_entity: {tweet: 'This is my second tweet!'})
       expect(@repo.all.count).to eql(2)
       expect(@repo.all.first.tweet).to eql('This is my first tweet!')
     end
@@ -72,11 +72,11 @@ describe Usecase::CreateTweet do
     end
 
     it 'should have a method execute which takes a hash of params' do
-      expect{@usecase.execute({tweet: 'a tweet'})}.not_to raise_error
+      expect{@usecase.execute(tweet_entity: {tweet: 'a tweet'})}.not_to raise_error
     end
 
     it 'should save the tweet' do
-      tweet = @usecase.execute(tweet: 'Hello World!')
+      tweet = @usecase.execute(tweet_entity: {tweet: 'Hello World!'})
       expect(tweet.id).to eql(1)
       expect(tweet.tweet).to eql('Hello World!')
     end

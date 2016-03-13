@@ -22,16 +22,16 @@ describe Usecase::CreateComment do
     end
 
     it 'should validate the comment content' do
-      comment = 'My first comment'
+      comment = {comment: 'My first comment'}
       expect{@validator.valid?(comment)}.not_to raise_error
     end
 
     it 'should fail for a blank comment' do
-      expect{@validator.valid?('')}.to raise_error(ValidationException)
+      expect{@validator.valid?({comment: ''})}.to raise_error(ValidationException)
     end
 
     it 'should fail if comment is over 180 chars long' do
-      comment = 'Bacon ipsum dolor amet frankfurter shankle tongue venison meatball, pork tail prosciutto pig beef ribs pancetta sirloin. Ball tip hamburger biltong, bacon alcatra capicola t-bone andouille fatback turkey. Meatloaf frankfurter turkey alcatra pig, cupim salami sausage pork flank turducken jerky boudin.'
+      comment = {comment: 'Bacon ipsum dolor amet frankfurter shankle tongue venison meatball, pork tail prosciutto pig beef ribs pancetta sirloin. Ball tip hamburger biltong, bacon alcatra capicola t-bone andouille fatback turkey. Meatloaf frankfurter turkey alcatra pig, cupim salami sausage pork flank turducken jerky boudin.'}
       expect{@validator.valid?(comment)}.to raise_error(ValidationException)
     end
   end
@@ -52,6 +52,7 @@ describe Usecase::CreateComment do
 
   context 'Usecase::CreateComment' do
     before :each do
+      # TODO: Should figure out how to mock a tweet without actually creating one like I am here.
       repo = MemoryRepository::TweetRepository.new
 
       user = instance_double('User', permissions: { comment: [:can_create_comment], tweet: [:can_create_tweet] })
@@ -59,7 +60,7 @@ describe Usecase::CreateComment do
         Policy::User::CanCreateTweet.new(user),
         repo,
         Validator::TweetValidator.new
-      ).execute(tweet: 'Some tweet')
+      ).execute(tweet_entity: {tweet: 'Some tweet'})
 
       policy = Policy::User::CanCreateComment.new(user)
       validator = Validator::CommentValidator.new
@@ -67,25 +68,13 @@ describe Usecase::CreateComment do
     end
 
     it 'should save a comment to a tweet' do
-      comment = CommentEntity.new(comment: 'Welcome')
-      result = @usecase.execute(@tweet.id, comment)
+      params = {id: 1, comment_entity: {comment: 'hello world'}}
+      result = @usecase.execute(params)
       expect(result.id).to eql(1)
+      p result.comments.first
       expect(result.comments.first.id).to eql(1)
-      expect(result.comments.first.comment).to eql('Welcome')
+      expect(result.comments.first.comment).to eql('hello world')
     end
   end
 
-  context 'Mapper' do
-    before :each do
-      @repo = MemoryRepository::TweetRepository.new
-    end
-
-    it 'should return a CommentEntity from the repo mapper when passed the correct params' do
-      params = {id: 1, comment_entity: {comment: 'a comment'}} # assuming tweet id of 1
-      result = @repo.mapper(params)
-      expect(result.first).to be_an_instance_of(CommentEntity)
-      expect(result.first.comment).to eql('a comment')
-    end
-
-  end
 end
