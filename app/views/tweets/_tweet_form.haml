@@ -1,4 +1,4 @@
 .well
-  = simple_form_for @tweet, url: tweets_path do |f|
+  = simple_form_for TweetEntity.new, url: tweets_path do |f|
     = f.input :tweet, placeholder: 'Whats on your mind?', label: 'Create a tweet'
     = f.button :submit, 'Tweet It!', class: 'btn btn-success'
